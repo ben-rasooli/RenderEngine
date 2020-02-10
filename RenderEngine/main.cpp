@@ -6,13 +6,6 @@
 
 #include <stdlib.h>
 
-GLfloat vertices[] =
-{
-	-0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.0f,  0.5f, 0.0f
-};
-
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "void main()\n"
@@ -102,6 +95,19 @@ int main()
 	glDeleteShader(fragmentShaderId);
 
 	// data - vertices
+	GLfloat vertices[] =
+	{
+		-0.5f, -0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
+		 0.5f,  0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f
+	};
+	GLuint indices[] =
+	{
+		0, 1, 2,
+		0, 2, 3
+	};
+
 	GLuint vertexArrayObjId;
 	glGenVertexArrays(1, &vertexArrayObjId);
 	glBindVertexArray(vertexArrayObjId);
@@ -113,6 +119,12 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	GLuint elementBufferObjId;
+	glGenBuffers(1, &elementBufferObjId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObjId);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -126,7 +138,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindVertexArray(vertexArrayObjId);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObjId);
+		glDrawElements(GL_TRIANGLES, sizeof(vertices) / sizeof(GLfloat), GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
