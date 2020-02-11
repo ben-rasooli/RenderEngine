@@ -3,22 +3,8 @@
 #include "ext.hpp"
 #include "glfw3.h"
 #include <iostream>
-
 #include <stdlib.h>
-
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0";
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -56,56 +42,20 @@ int main()
 		return -3;
 	}
 
-	// vertex shader
-	GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShaderId, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShaderId);
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShaderId, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	// fragment shader
-	GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShaderId);
-	glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShaderId, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	// shader program
-	GLuint shaderProgramId = glCreateProgram();
-	glAttachShader(shaderProgramId, vertexShaderId);
-	glAttachShader(shaderProgramId, fragmentShaderId);
-	glLinkProgram(shaderProgramId);
-	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgramId, 512, NULL, infoLog);
-	}
-
-	glUseProgram(shaderProgramId);
-	glDeleteShader(vertexShaderId);
-	glDeleteShader(fragmentShaderId);
+	Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
 
 	// data - vertices
 	GLfloat vertices[] =
 	{
-		-0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f,
-		 0.5f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f
+		-0.5f, -0.5f, 0.0f,		0.8f, 0.5f, 0.2f,
+		-0.5f,  0.5f, 0.0f,		0.2f, 0.9f, 0.8f,
+		 0.5f,  0.5f, 0.0f,		0.5f, 0.2f, 0.5f,
+		 0.5f, -0.5f, 0.0f,		0.3f, 0.0f, 0.3f
 	};
 	GLuint indices[] =
 	{
 		0, 1, 2,
-		0, 2, 3
+		2, 3, 0
 	};
 
 	GLuint vertexArrayObjId;
@@ -116,8 +66,12 @@ int main()
 	glGenBuffers(1, &vertexBufferObjId);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	GLuint elementBufferObjId;
 	glGenBuffers(1, &elementBufferObjId);
@@ -137,8 +91,13 @@ int main()
 		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		shader.use();
+
 		glBindVertexArray(vertexArrayObjId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObjId);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		GLfloat greenColor = sin(glfwGetTime()) / 2.0f + 0.5f;
+		shader.setFloat("variableColorG", greenColor);
 		glDrawElements(GL_TRIANGLES, sizeof(vertices) / sizeof(GLfloat), GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
