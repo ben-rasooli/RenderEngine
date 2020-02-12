@@ -45,7 +45,8 @@ int main()
 	}
 
 	Geometry geometry;
-	Texture texture("./UV.png");
+	Texture texture_main("./UV.png", GL_TEXTURE0);
+	Texture texture_dirt("./DirtTexture.jpg", GL_TEXTURE1);
 	Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
 
 	while (!glfwWindowShouldClose(window))
@@ -57,8 +58,11 @@ int main()
 		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		texture.SetActive();
 		shader.use();
+		shader.setInt("texture1", 0);
+		shader.setInt("texture2", 1);
+		texture_main.SetActive();
+		texture_dirt.SetActive();
 		geometry.SetActive();
 		
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -6,17 +6,20 @@
 
 struct Texture
 {
-	Texture(const char* filePath)
+	Texture(const char* filePath, GLenum textureUnit)
 	{
+		_textureUnit = textureUnit;
 		glGenTextures(1, &texture);
+		glActiveTexture(_textureUnit);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		int width, height, nrChannels;
-		unsigned char* data = stbi_load("./UV.png", &width, &height, &nrChannels, 0);
+		unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
 		if (data)
 		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			GLenum format = nrChannels == 4 ? GL_RGBA : GL_RGB;
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
@@ -27,8 +30,14 @@ struct Texture
 		stbi_image_free(data);
 	}
 
+	~Texture()
+	{
+		glDeleteTextures(1, &texture);
+	}
+
 	void SetActive()
 	{
+		glActiveTexture(_textureUnit);
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 
@@ -39,4 +48,5 @@ struct Texture
 
 private:
 	GLuint texture;
+	GLenum _textureUnit;
 };
