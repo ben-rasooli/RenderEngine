@@ -9,9 +9,9 @@ struct Texture
 	Texture(const char* filePath, GLenum textureUnit)
 	{
 		_textureUnit = textureUnit;
-		glGenTextures(1, &texture);
+		glGenTextures(1, &_texture);
 		glActiveTexture(_textureUnit);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindTexture(GL_TEXTURE_2D, _texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		int width, height, nrChannels;
@@ -32,13 +32,13 @@ struct Texture
 
 	~Texture()
 	{
-		glDeleteTextures(1, &texture);
+		glDeleteTextures(1, &_texture);
 	}
 
 	void SetActive()
 	{
 		glActiveTexture(_textureUnit);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindTexture(GL_TEXTURE_2D, _texture);
 	}
 
 	void SetInactive()
@@ -47,6 +47,6 @@ struct Texture
 	}
 
 private:
-	GLuint texture;
+	GLuint _texture;
 	GLenum _textureUnit;
 };
