@@ -63,7 +63,7 @@ int main()
 
 	Plane plane;
 	OBJMesh mesh;
-	//mesh.load();
+	mesh.load("./models/Bunny.obj", false);
 	Texture texture_main("./UV.png", GL_TEXTURE0);
 	Texture texture_dirt("./DirtTexture.jpg", GL_TEXTURE1);
 	Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
@@ -86,7 +86,8 @@ int main()
 		plane.SetActive();
 		setTransformationMatrices(shader);
 		//glDrawArrays(GL_TRIANGLES, 0, plane.VertexCount());
-		glDrawElements(GL_TRIANGLES, plane.VertexCount(), GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, plane.VertexCount(), GL_UNSIGNED_INT, 0);
+		mesh.draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
