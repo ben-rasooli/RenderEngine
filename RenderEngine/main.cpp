@@ -62,7 +62,7 @@ int main()
 		return -3;
 	}
 
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	Geometry geometry;
 	Texture texture_main("./UV.png", GL_TEXTURE0);
@@ -76,7 +76,7 @@ int main()
 
 		// render
 		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
 		shader.setInt("texture1", 0);
@@ -84,17 +84,8 @@ int main()
 		texture_main.SetActive();
 		texture_dirt.SetActive();
 		geometry.SetActive();
-		
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		/*double mousePos_X;
-		double mousePos_Y;
-		glfwGetCursorPos(window, &mousePos_X, &mousePos_Y);
-		GLfloat greenColor = sin((float)mousePos_X);
-		GLfloat blueColor = sin((float)mousePos_Y);
-		shader.setFloat("variableColorG", greenColor);
-		shader.setFloat("variableColorB", blueColor);*/
 		setTransformationMatrices(shader);
-		glDrawElements(GL_TRIANGLES, geometry.Size(), GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, geometry.VertexCount());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
