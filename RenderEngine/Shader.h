@@ -10,7 +10,7 @@ using namespace std;
 class Shader
 {
 public:
-	GLuint programId;
+	GLuint ID;
 
 	Shader(const char* vShaderPath, const char* fShaderPath)
 	{
@@ -19,14 +19,14 @@ public:
 
 		if (!vShaderFile.is_open() && !fShaderFile.is_open())
 			throw "Could not Load File";
-		
+
 		stringstream vShaderStream, fShaderStream;
 		vShaderStream << vShaderFile.rdbuf();
 		fShaderStream << fShaderFile.rdbuf();
 
 		std::string vShaderString = vShaderStream.str();
 		std::string fShaderString = fShaderStream.str();
-		
+
 		const char* vShaderCode = vShaderString.c_str();
 		const char* fShaderCode = fShaderString.c_str();
 
@@ -45,11 +45,11 @@ public:
 		glCompileShader(fragmentShader);
 		checkCompileErrors(fragmentShader, "FRAGMENT");
 
-		programId = glCreateProgram();
-		glAttachShader(programId, vertexShader);
-		glAttachShader(programId, fragmentShader);
-		glLinkProgram(programId);
-		checkCompileErrors(programId, "PROGRAM");
+		ID = glCreateProgram();
+		glAttachShader(ID, vertexShader);
+		glAttachShader(ID, fragmentShader);
+		glLinkProgram(ID);
+		checkCompileErrors(ID, "PROGRAM");
 
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
@@ -57,22 +57,27 @@ public:
 
 	void use()
 	{
-		glUseProgram(programId);
+		glUseProgram(ID);
 	}
 
 	void setBool(const string& name, bool value) const
 	{
-		glUniform1i(glGetUniformLocation(programId, name.c_str()), (int)value);
+		glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 	}
 
 	void setInt(const string& name, int value) const
 	{
-		glUniform1i(glGetUniformLocation(programId, name.c_str()), value);
+		glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 	}
 
 	void setFloat(const string& name, float value) const
 	{
-		glUniform1f(glGetUniformLocation(programId, name.c_str()), value);
+		glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+	}
+
+	void SetMat4(const string& name, glm::mat4 value)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 	}
 
 private:
