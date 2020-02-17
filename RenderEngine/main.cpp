@@ -5,9 +5,10 @@
 #include <iostream>
 #include <stdlib.h>
 #include "Shader.h"
-#include "Geometry.h"
-#include "Texture.h"
-#include "camera.h";
+#include "plane.h"
+#include "texture.h"
+#include "camera.h"
+#include "OBJMesh.h"
 
 void setDeltaTime();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -21,7 +22,7 @@ const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 1000;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 1.0f, 1.8f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -30.0f);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -60,7 +61,9 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	Geometry geometry;
+	Plane plane;
+	OBJMesh mesh;
+	//mesh.load();
 	Texture texture_main("./UV.png", GL_TEXTURE0);
 	Texture texture_dirt("./DirtTexture.jpg", GL_TEXTURE1);
 	Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
@@ -80,9 +83,10 @@ int main()
 		shader.setInt("texture2", 1);
 		texture_main.SetActive();
 		texture_dirt.SetActive();
-		geometry.SetActive();
+		plane.SetActive();
 		setTransformationMatrices(shader);
-		glDrawArrays(GL_TRIANGLES, 0, geometry.VertexCount());
+		//glDrawArrays(GL_TRIANGLES, 0, plane.VertexCount());
+		glDrawElements(GL_TRIANGLES, plane.VertexCount(), GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -145,7 +149,6 @@ void processInput(GLFWwindow* window)
 void setTransformationMatrices(Shader& shader)
 {
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(-60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	shader.SetMat4("model", modelMatrix);
 
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
