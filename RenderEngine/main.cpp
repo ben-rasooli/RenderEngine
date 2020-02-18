@@ -1,26 +1,4 @@
-#include "mainMethodsDeclarations.h"
-
-// settings
-const unsigned int SCR_WIDTH = 1000;
-const unsigned int SCR_HEIGHT = 1000;
-
-GLFWwindow* window;
-
-// camera
-Camera camera(glm::vec3(0.0f, 1.0f, 1.8f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -30.0f);
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
-
-// timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
-// geometries
-Plane plane;
-OBJMesh mesh;
-
-Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
+#include "mainDetails.h"
 
 int main()
 {
@@ -33,7 +11,7 @@ int main()
 		return -2;
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	setupInput(window);
+	setupInput();
 
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
@@ -43,28 +21,33 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
+	shader = new Shader("./vertexShader.glsl", "./fragmentShader.glsl");
+	setupTextures();
+	plane = new Plane();
 	mesh.load("./models/Bunny.obj", false);
-	setupTextures(shader);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		setDeltaTime();
-		processInput(window);
-
-		// render
-		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+		//glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.use();
-		plane.SetActive();
-		setTransformationMatrices(shader);
-		glDrawElements(GL_TRIANGLES, plane.VertexCount(), GL_UNSIGNED_INT, 0);
+		setDeltaTime();
+		processInput();
+
+		shader->use();
+		plane->SetActive();
+		setTransformationMatrices();
+		glDrawElements(GL_TRIANGLES, plane->VertexCount(), GL_UNSIGNED_INT, 0);
 		mesh.draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
+	delete plane;
+	delete texture_main;
+	delete texture_dirt;
+	delete shader;
 	glfwTerminate();
 	return 0;
 }
@@ -97,19 +80,19 @@ void setDeltaTime()
 	lastFrame = currentFrame;
 }
 
-void setupTextures(Shader& shader)
+void setupTextures()
 {
-	Texture texture_main("./UV.png", GL_TEXTURE0);
-	Texture texture_dirt("./DirtTexture.jpg", GL_TEXTURE1);
+	texture_main = new Texture("./textures/Gray.jpg", GL_TEXTURE0);
+	texture_dirt = new Texture("./textures/DirtTexture.jpg", GL_TEXTURE1);
 
-	shader.use();
-	shader.setInt("texture1", 0);
-	shader.setInt("texture2", 1);
-	texture_main.SetActive();
-	texture_dirt.SetActive();
+	shader->use();
+	shader->setInt("texture1", 0);
+	//shader->setInt("texture2", 1);
+	texture_main->SetActive();
+	//texture_dirt->SetActive();
 }
 
-void setupInput(GLFWwindow* window)
+void setupInput()
 {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -131,7 +114,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	float yoffset = lastY - ypos;
 
 	lastX = xpos;
 	lastY = ypos;
@@ -144,7 +127,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	camera.ProcessMouseScroll(yoffset);
 }
 
-void processInput(GLFWwindow* window)
+void processInput()
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -159,14 +142,14 @@ void processInput(GLFWwindow* window)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-void setTransformationMatrices(Shader& shader)
+void setTransformationMatrices()
 {
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	shader.SetMat4("model", modelMatrix);
+	shader->SetMat4("model", modelMatrix);
 
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	shader.SetMat4("projection", projectionMatrix);
+	shader->SetMat4("projection", projectionMatrix);
 
 	glm::mat4 viewMatrix = camera.GetViewMatrix();
-	shader.SetMat4("view", viewMatrix);
+	shader->SetMat4("view", viewMatrix);
 }

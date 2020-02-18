@@ -152,7 +152,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Geometry.h" />
-    <ClInclude Include="mainMethodsDeclarations.h" />
+    <ClInclude Include="mainDetails.h" />
     <ClInclude Include="OBJMesh.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="Shader.h" />
