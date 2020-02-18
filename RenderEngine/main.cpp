@@ -1,25 +1,10 @@
-#include "gl_core_4_5.h"
-#include "glm.hpp"
-#include "ext.hpp"
-#include "glfw3.h"
-#include <iostream>
-#include <stdlib.h>
-#include "Shader.h"
-#include "plane.h"
-#include "texture.h"
-#include "camera.h"
-#include "OBJMesh.h"
-
-void setDeltaTime();
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window);
-void setTransformationMatrices(Shader& shader);
+#include "mainMethodsDeclarations.h"
 
 // settings
 const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 1000;
+
+GLFWwindow* window;
 
 // camera
 Camera camera(glm::vec3(0.0f, 1.0f, 1.8f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -30.0f);
@@ -31,27 +16,24 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// geometries
+Plane plane;
+OBJMesh mesh;
+
+Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
+
 int main()
 {
 	if (!glfwInit())
 		return -1;
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(1000, 1000, "Render Engine", NULL, NULL);
+	setupGLFW();
 
-	if (window == NULL)
-	{
-		glfwTerminate();
+	if (!canCreateWindow())
 		return -2;
-	}
 
-	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	setupInput(window);
 
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
@@ -61,17 +43,12 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	Plane plane;
-	OBJMesh mesh;
 	mesh.load("./models/Bunny.obj", false);
-	Texture texture_main("./UV.png", GL_TEXTURE0);
-	Texture texture_dirt("./DirtTexture.jpg", GL_TEXTURE1);
-	Shader shader("./vertexShader.glsl", "./fragmentShader.glsl");
+	setupTextures(shader);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		setDeltaTime();
-
 		processInput(window);
 
 		// render
@@ -79,14 +56,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
-		shader.setInt("texture1", 0);
-		shader.setInt("texture2", 1);
-		texture_main.SetActive();
-		texture_dirt.SetActive();
 		plane.SetActive();
 		setTransformationMatrices(shader);
-		//glDrawArrays(GL_TRIANGLES, 0, plane.VertexCount());
-		//glDrawElements(GL_TRIANGLES, plane.VertexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, plane.VertexCount(), GL_UNSIGNED_INT, 0);
 		mesh.draw();
 
 		glfwSwapBuffers(window);
@@ -97,11 +69,51 @@ int main()
 	return 0;
 }
 
+void setupGLFW()
+{
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+
+bool canCreateWindow()
+{
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Render Engine", NULL, NULL);
+
+	if (window == NULL)
+	{
+		glfwTerminate();
+		return false;
+	}
+
+	glfwMakeContextCurrent(window);
+	return true;
+}
+
 void setDeltaTime()
 {
 	float currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
+}
+
+void setupTextures(Shader& shader)
+{
+	Texture texture_main("./UV.png", GL_TEXTURE0);
+	Texture texture_dirt("./DirtTexture.jpg", GL_TEXTURE1);
+
+	shader.use();
+	shader.setInt("texture1", 0);
+	shader.setInt("texture2", 1);
+	texture_main.SetActive();
+	texture_dirt.SetActive();
+}
+
+void setupInput(GLFWwindow* window)
+{
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

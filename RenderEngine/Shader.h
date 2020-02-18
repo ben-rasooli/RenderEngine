@@ -54,7 +54,7 @@ public:
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 	}
-
+	 
 	void use()
 	{
 		glUseProgram(ID);
