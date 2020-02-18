@@ -35,8 +35,12 @@ int main()
 		processInput();
 
 		shader->use();
-		plane->SetActive();
+		shader->SetVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+		shader->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader->SetVec3("lightPos", glm::vec3(20.0f, 20.0f, 20.0f));
+
 		setTransformationMatrices();
+		plane->SetActive();
 		glDrawElements(GL_TRIANGLES, plane->VertexCount(), GL_UNSIGNED_INT, 0);
 		mesh.draw();
 
