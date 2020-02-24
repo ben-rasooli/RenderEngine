@@ -16,7 +16,7 @@ void setDeltaTime();
 void setupGLFW();
 bool canCreateWindow();
 void setupInput();
-void setupTextures();
+void setupTexture();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -31,10 +31,9 @@ const unsigned int SCR_HEIGHT = 1000;
 
 GLFWwindow* window;
 Shader* shader;
-Texture* texture_main;
-Texture* texture_dirt;
-Plane* plane;
-OBJMesh rock_mesh_1;
+Texture* firstRock_texture;
+Texture* secondRock_texture;
+//OBJMesh rock_mesh_1;
 OBJMesh rock_mesh_2;
 
 // camera

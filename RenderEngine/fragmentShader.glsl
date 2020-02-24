@@ -4,11 +4,9 @@ out vec4 FragColor;
 
 in vec3 FragPos;
 in vec3 Normal;
-//in vec2 TexCoord;
+in vec2 TexCoord;
 
 uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform vec3 objectColor;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -27,10 +25,8 @@ void main()
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128);
     vec3 specular = specularStrength * spec * lightColor;
 
-    FragColor = vec4((ambient + diffuse + specular) * objectColor, 1.0);
-
-    //FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.4);
+    FragColor = texture(texture1, TexCoord) * vec4((ambient + diffuse + specular), 1.0);
 }

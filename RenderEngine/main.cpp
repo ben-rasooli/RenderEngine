@@ -22,9 +22,8 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	shader = new Shader("./vertexShader.glsl", "./fragmentShader.glsl");
-	setupTextures();
-	plane = new Plane();
-	rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
+	setupTexture();
+	//rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
 	rock_mesh_2.load("./models/Rock_Set/Rock_5/Rock_5.obj", false);
 
 	while (!glfwWindowShouldClose(window))
@@ -36,23 +35,19 @@ int main()
 		processInput();
 
 		shader->use();
-		shader->SetVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 		shader->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		shader->SetVec3("lightPos", glm::vec3(20.0f, 20.0f, 20.0f));
 		shader->SetVec3("viewPos", camera.Position);
 
-		plane->SetActive();
-		glDrawElements(GL_TRIANGLES, plane->VertexCount(), GL_UNSIGNED_INT, 0);
-		drawFirstRock();
+		//drawFirstRock();
 		drawSecondRock();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	delete plane;
-	delete texture_main;
-	delete texture_dirt;
+	delete firstRock_texture;
+	delete secondRock_texture;
 	delete shader;
 	glfwTerminate();
 	return 0;
@@ -86,16 +81,13 @@ void setDeltaTime()
 	lastFrame = currentFrame;
 }
 
-void setupTextures()
+void setupTexture()
 {
-	texture_main = new Texture("./textures/Gray.jpg", GL_TEXTURE0);
-	texture_dirt = new Texture("./textures/DirtTexture.jpg", GL_TEXTURE1);
+	//firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Rock_2_Base_Color.jpg", GL_TEXTURE0);
+	secondRock_texture = new Texture("./models/Rock_Set/Rock_5/Rock_5_Tex/Rock_5_Base_Color.jpg", GL_TEXTURE0);
 
 	shader->use();
 	shader->setInt("texture1", 0);
-	//shader->setInt("texture2", 1);
-	texture_main->SetActive();
-	//texture_dirt->SetActive();
 }
 
 void setupInput()
@@ -156,7 +148,9 @@ void drawFirstRock()
 	shader->SetMat4("model", modelMatrix);
 
 	setVPTransformationMatrices();
-	rock_mesh_1.draw();
+	shader->use();
+	firstRock_texture->SetActive();
+	//rock_mesh_1.draw();
 }
 
 void drawSecondRock()
@@ -167,6 +161,8 @@ void drawSecondRock()
 	shader->SetMat4("model", modelMatrix);
 
 	setVPTransformationMatrices();
+	shader->use();
+	secondRock_texture->SetActive();
 	rock_mesh_2.draw();
 }
 
