@@ -24,11 +24,12 @@ int main()
 	shader = new Shader("./vertexShader.glsl", "./fragmentShader.glsl");
 	setupTextures();
 	plane = new Plane();
-	mesh.load("./models/Bunny.obj", false);
+	rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
+	rock_mesh_2.load("./models/Rock_Set/Rock_5/Rock_5.obj", false);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		//glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		setDeltaTime();
@@ -38,11 +39,12 @@ int main()
 		shader->SetVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 		shader->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		shader->SetVec3("lightPos", glm::vec3(20.0f, 20.0f, 20.0f));
+		shader->SetVec3("viewPos", camera.Position);
 
-		setTransformationMatrices();
 		plane->SetActive();
 		glDrawElements(GL_TRIANGLES, plane->VertexCount(), GL_UNSIGNED_INT, 0);
-		mesh.draw();
+		drawFirstRock();
+		drawSecondRock();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -146,11 +148,30 @@ void processInput()
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-void setTransformationMatrices()
+void drawFirstRock()
 {
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(4.0f, 0.0f, 0.0f));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.01f, 0.01f, 0.01f));
 	shader->SetMat4("model", modelMatrix);
 
+	setVPTransformationMatrices();
+	rock_mesh_1.draw();
+}
+
+void drawSecondRock()
+{
+	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(-4.0f, 0.0f, 0.0f));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.01f, 0.01f, 0.01f));
+	shader->SetMat4("model", modelMatrix);
+
+	setVPTransformationMatrices();
+	rock_mesh_2.draw();
+}
+
+void setVPTransformationMatrices()
+{
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 	shader->SetMat4("projection", projectionMatrix);
 

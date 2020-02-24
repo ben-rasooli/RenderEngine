@@ -21,7 +21,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput();
-void setTransformationMatrices();
+void drawFirstRock();
+void drawSecondRock();
+void setVPTransformationMatrices();
 
 // settings
 const unsigned int SCR_WIDTH = 1000;
@@ -32,7 +34,8 @@ Shader* shader;
 Texture* texture_main;
 Texture* texture_dirt;
 Plane* plane;
-OBJMesh mesh;
+OBJMesh rock_mesh_1;
+OBJMesh rock_mesh_2;
 
 // camera
 Camera camera(glm::vec3(0.0f, 15.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -30.0f);
