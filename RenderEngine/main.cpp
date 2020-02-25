@@ -88,9 +88,9 @@ void setDeltaTime()
 
 void setupTexture()
 {
-	firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Rock_2_Base_Color.jpg", GL_TEXTURE0);
-	secondRock_texture = new Texture("./models/Rock_Set/Rock_5/Rock_5_Tex/Rock_5_Base_Color.jpg", GL_TEXTURE0);
-
+	firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Diffuse.jpg", GL_TEXTURE0);
+	secondRock_texture = new Texture("./models/Rock_Set/Rock_5/Rock_5_Tex/Diffuse.jpg", GL_TEXTURE0);
+	
 	shader->use();
 	shader->setInt("texture1", 0);
 }
