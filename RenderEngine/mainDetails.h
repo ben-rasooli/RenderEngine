@@ -33,7 +33,7 @@ GLFWwindow* window;
 Shader* shader;
 Texture* firstRock_texture;
 Texture* secondRock_texture;
-//OBJMesh rock_mesh_1;
+OBJMesh rock_mesh_1;
 OBJMesh rock_mesh_2;
 
 // camera

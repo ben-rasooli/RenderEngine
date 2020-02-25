@@ -23,7 +23,7 @@ int main()
 
 	shader = new Shader("./vertexShader.glsl", "./fragmentShader.glsl");
 	setupTexture();
-	//rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
+	rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
 	rock_mesh_2.load("./models/Rock_Set/Rock_5/Rock_5.obj", false);
 
 	while (!glfwWindowShouldClose(window))
@@ -35,11 +35,11 @@ int main()
 		processInput();
 
 		shader->use();
-		shader->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader->SetVec3("lightPos", glm::vec3(20.0f, 20.0f, 20.0f));
+		shader->SetVec3("light.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
+		shader->SetVec3("light.position", glm::vec3(-20.0f, -20.0f, -20.0f));
 		shader->SetVec3("viewPos", camera.Position);
 
-		//drawFirstRock();
+		drawFirstRock();
 		drawSecondRock();
 
 		glfwSwapBuffers(window);
@@ -83,7 +83,7 @@ void setDeltaTime()
 
 void setupTexture()
 {
-	//firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Rock_2_Base_Color.jpg", GL_TEXTURE0);
+	firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Rock_2_Base_Color.jpg", GL_TEXTURE0);
 	secondRock_texture = new Texture("./models/Rock_Set/Rock_5/Rock_5_Tex/Rock_5_Base_Color.jpg", GL_TEXTURE0);
 
 	shader->use();
@@ -150,7 +150,7 @@ void drawFirstRock()
 	setVPTransformationMatrices();
 	shader->use();
 	firstRock_texture->SetActive();
-	//rock_mesh_1.draw();
+	rock_mesh_1.draw();
 }
 
 void drawSecondRock()
