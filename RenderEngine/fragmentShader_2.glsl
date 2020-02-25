@@ -9,13 +9,13 @@ struct Light {
 
 in vec3 FragPos;
 in vec3 Normal;
+in vec4 VertexPosition;
 in vec2 TexCoord;
 
 uniform Light light_1;
 uniform Light light_2;
 uniform sampler2D texture1;
 uniform vec3 viewPos;
-uniform float time;
 
 vec3 calcPositionalLight(Light light);
 
@@ -24,7 +24,7 @@ void main()
     vec3 output = vec3(0.0);
     output += calcPositionalLight(light_1);
     output += calcPositionalLight(light_2);
-    output *= sin(time) + 1;
+    output *= (sin(VertexPosition.y) + 1.5);
 
     FragColor = texture(texture1, TexCoord) * vec4(output, 1.0);
 }

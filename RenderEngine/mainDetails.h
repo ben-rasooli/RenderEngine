@@ -21,11 +21,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput();
-void setupFirstShader();
-void setupSecondShader();
+void setupPhongLighting(Shader* shader);
 void drawFirstRock();
 void drawSecondRock();
-void setVPTransformationMatrices();
 
 // settings
 const unsigned int SCR_WIDTH = 1000;
@@ -34,8 +32,8 @@ const unsigned int SCR_HEIGHT = 1000;
 GLFWwindow* window;
 Shader* shader_1;
 Shader* shader_2;
-Texture* firstRock_texture;
-Texture* secondRock_texture;
+Texture* rock_1_texture;
+Texture* rock_2_texture;
 OBJMesh rock_mesh_1;
 OBJMesh rock_mesh_2;
 

@@ -24,8 +24,8 @@ int main()
 	shader_1 = new Shader("./vertexShader_1.glsl", "./fragmentShader_1.glsl");
 	shader_2 = new Shader("./vertexShader_2.glsl", "./fragmentShader_2.glsl");
 	setupTexture();
-	rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
-	rock_mesh_2.load("./models/Rock_Set/Rock_5/Rock_5.obj", false);
+	rock_mesh_1.load("./models/Rock_1/Rock.obj", false);
+	rock_mesh_2.load("./models/Rock_2/Rock.obj", false);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -35,18 +35,19 @@ int main()
 		setDeltaTime();
 		processInput();
 
-		setupFirstShader();
+		setupPhongLighting(shader_1);
 		drawFirstRock();
 
-		setupSecondShader();
+		setupPhongLighting(shader_2);
+		shader_2->setFloat("time", glfwGetTime());
 		drawSecondRock();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	delete firstRock_texture;
-	delete secondRock_texture;
+	delete rock_1_texture;
+	delete rock_2_texture;
 	delete shader_1;
 	delete shader_2;
 	glfwTerminate();
@@ -83,8 +84,8 @@ void setDeltaTime()
 
 void setupTexture()
 {
-	firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Diffuse.jpg", GL_TEXTURE0);
-	secondRock_texture = new Texture("./models/Rock_Set/Rock_5/Rock_5_Tex/Diffuse.jpg", GL_TEXTURE0);
+	rock_1_texture = new Texture("./models/Rock_1/Diffuse.jpg", GL_TEXTURE0);
+	rock_2_texture = new Texture("./models/Rock_2/Diffuse.jpg", GL_TEXTURE0);
 	
 	shader_1->use();
 	shader_1->setInt("texture1", 0);
@@ -143,31 +144,17 @@ void processInput()
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-void setupFirstShader()
+void setupPhongLighting(Shader* shader)
 {
-	shader_1->use();
+	shader->use();
 
-	shader_1->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
-	shader_1->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
+	shader->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
+	shader->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
 
-	shader_1->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
-	shader_1->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
+	shader->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
+	shader->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
 
-	shader_1->SetVec3("viewPos", camera.Position);
-}
-void setupSecondShader()
-{
-	shader_2->use();
-		   
-	shader_2->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
-	shader_2->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
-		   
-	shader_2->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
-	shader_2->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
-		   
 	shader_2->SetVec3("viewPos", camera.Position);
-
-	shader_2->setFloat("time", glfwGetTime());
 }
 
 void drawFirstRock()
@@ -184,7 +171,7 @@ void drawFirstRock()
 	shader_1->SetMat4("view", viewMatrix);
 
 	shader_1->use();
-	firstRock_texture->SetActive();
+	rock_1_texture->SetActive();
 	rock_mesh_1.draw();
 }
 
@@ -202,6 +189,6 @@ void drawSecondRock()
 	shader_2->SetMat4("view", viewMatrix);
 
 	shader_2->use();
-	secondRock_texture->SetActive();
+	rock_2_texture->SetActive();
 	rock_mesh_2.draw();
 }

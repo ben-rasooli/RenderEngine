@@ -11,12 +11,14 @@ uniform float time;
 
 out vec3 FragPos;
 out vec3 Normal;
+out vec4 VertexPosition;
 out vec2 TexCoord;
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(aPos * (sin(time) + 1), 1.0);
+    gl_Position = projection * view * model * vec4(aPos * (sin(time) / 10 + 1), 1.0);
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = aNormal;
+    VertexPosition = gl_Position;
     TexCoord = aTexCoord;
 }
