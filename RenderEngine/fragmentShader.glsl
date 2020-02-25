@@ -11,7 +11,8 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
 
-uniform Light light;
+uniform Light light_1;
+uniform Light light_2;
 uniform sampler2D texture1;
 uniform vec3 viewPos;
 
@@ -19,7 +20,11 @@ vec3 calcPositionalLight(Light light);
 
 void main()
 {
-    FragColor = texture(texture1, TexCoord) * vec4(calcPositionalLight(light), 1.0);
+    vec3 output = vec3(0.0);
+    output += calcPositionalLight(light_1);
+    output += calcPositionalLight(light_2);
+
+    FragColor = texture(texture1, TexCoord) * vec4(output, 1.0);
 }
 
 vec3 calcPositionalLight(Light light)

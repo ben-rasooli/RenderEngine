@@ -35,8 +35,13 @@ int main()
 		processInput();
 
 		shader->use();
-		shader->SetVec3("light.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
-		shader->SetVec3("light.position", glm::vec3(-20.0f, -20.0f, -20.0f));
+
+		shader->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
+		shader->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
+		
+		shader->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
+		shader->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
+
 		shader->SetVec3("viewPos", camera.Position);
 
 		drawFirstRock();
