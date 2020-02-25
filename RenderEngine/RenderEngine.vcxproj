@@ -161,8 +161,10 @@
     <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragmentShader.glsl" />
-    <None Include="vertexShader.glsl" />
+    <None Include="fragmentShader_1.glsl" />
+    <None Include="fragmentShader_2.glsl" />
+    <None Include="vertexShader_1.glsl" />
+    <None Include="vertexShader_2.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

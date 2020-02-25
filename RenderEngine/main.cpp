@@ -21,7 +21,8 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	shader = new Shader("./vertexShader.glsl", "./fragmentShader.glsl");
+	shader_1 = new Shader("./vertexShader_1.glsl", "./fragmentShader_1.glsl");
+	shader_2 = new Shader("./vertexShader_2.glsl", "./fragmentShader_2.glsl");
 	setupTexture();
 	rock_mesh_1.load("./models/Rock_Set/Rock_2/Rock_2.obj", false);
 	rock_mesh_2.load("./models/Rock_Set/Rock_5/Rock_5.obj", false);
@@ -34,17 +35,10 @@ int main()
 		setDeltaTime();
 		processInput();
 
-		shader->use();
-
-		shader->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
-		shader->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
-		
-		shader->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
-		shader->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
-
-		shader->SetVec3("viewPos", camera.Position);
-
+		setupFirstShader();
 		drawFirstRock();
+
+		setupSecondShader();
 		drawSecondRock();
 
 		glfwSwapBuffers(window);
@@ -53,7 +47,8 @@ int main()
 
 	delete firstRock_texture;
 	delete secondRock_texture;
-	delete shader;
+	delete shader_1;
+	delete shader_2;
 	glfwTerminate();
 	return 0;
 }
@@ -91,8 +86,11 @@ void setupTexture()
 	firstRock_texture = new Texture("./models/Rock_Set/Rock_2/Rock_2_Tex/Diffuse.jpg", GL_TEXTURE0);
 	secondRock_texture = new Texture("./models/Rock_Set/Rock_5/Rock_5_Tex/Diffuse.jpg", GL_TEXTURE0);
 	
-	shader->use();
-	shader->setInt("texture1", 0);
+	shader_1->use();
+	shader_1->setInt("texture1", 0);
+
+	shader_2->use();
+	shader_2->setInt("texture1", 0);
 }
 
 void setupInput()
@@ -145,15 +143,47 @@ void processInput()
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
+void setupFirstShader()
+{
+	shader_1->use();
+
+	shader_1->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
+	shader_1->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
+
+	shader_1->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
+	shader_1->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
+
+	shader_1->SetVec3("viewPos", camera.Position);
+}
+void setupSecondShader()
+{
+	shader_2->use();
+		   
+	shader_2->SetVec3("light_1.diffuse", glm::vec3(0.25f, 0.40f, 0.40f));
+	shader_2->SetVec3("light_1.position", glm::vec3(-20.0f, -20.0f, 0.0f));
+		   
+	shader_2->SetVec3("light_2.diffuse", glm::vec3(0.8f, 0.2f, 0.2f));
+	shader_2->SetVec3("light_2.position", glm::vec3(20.0f, 20.0f, 0.0f));
+		   
+	shader_2->SetVec3("viewPos", camera.Position);
+
+	shader_2->setFloat("time", glfwGetTime());
+}
+
 void drawFirstRock()
 {
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(4.0f, 0.0f, 0.0f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.01f, 0.01f, 0.01f));
-	shader->SetMat4("model", modelMatrix);
+	shader_1->SetMat4("model", modelMatrix);
 
-	setVPTransformationMatrices();
-	shader->use();
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	shader_1->SetMat4("projection", projectionMatrix);
+
+	glm::mat4 viewMatrix = camera.GetViewMatrix();
+	shader_1->SetMat4("view", viewMatrix);
+
+	shader_1->use();
 	firstRock_texture->SetActive();
 	rock_mesh_1.draw();
 }
@@ -163,19 +193,15 @@ void drawSecondRock()
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(-4.0f, 0.0f, 0.0f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.01f, 0.01f, 0.01f));
-	shader->SetMat4("model", modelMatrix);
+	shader_2->SetMat4("model", modelMatrix);
 
-	setVPTransformationMatrices();
-	shader->use();
-	secondRock_texture->SetActive();
-	rock_mesh_2.draw();
-}
-
-void setVPTransformationMatrices()
-{
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	shader->SetMat4("projection", projectionMatrix);
+	shader_2->SetMat4("projection", projectionMatrix);
 
 	glm::mat4 viewMatrix = camera.GetViewMatrix();
-	shader->SetMat4("view", viewMatrix);
+	shader_2->SetMat4("view", viewMatrix);
+
+	shader_2->use();
+	secondRock_texture->SetActive();
+	rock_mesh_2.draw();
 }
